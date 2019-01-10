@@ -6,6 +6,7 @@
 // @match        http://mycast.xyz/home/chat/*
 // @grant        none
 // @require      https://code.jquery.com/jquery-3.3.1.min.js#sha256=FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=
+// @@updateURL   https://raw.githubusercontent.com/z1z2z3z4/mychat/master/mychat.js
 // ==/UserScript==
 
 /*
