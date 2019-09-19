@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         mychat
-// @version      1.09
+// @version      1.10
 // @description  ignore chat
 // @author       z1z2z3z4
 // @match        http://mycast.xyz/home/chat/*
@@ -36,50 +36,64 @@ xmlhttp.onreadystatechange = function() {
 xmlhttp.open("GET", "http://mycast.xyz/home/photo/photolist/", true);
 xmlhttp.send();
 
+function now() {
+	var date = new Date();
+	var m = date.getMonth()+1;
+	var d = date.getDate();
+	var h = date.getHours();
+	var i = date.getMinutes();
+	var s = date.getSeconds();
+	return date.getFullYear()+'-'+(m>9?m:'0'+m)+'-'+(d>9?d:'0'+d)+' '+(h>9?h:'0'+h)+':'+(i>9?i:'0'+i) /*+':'+(s>9?s:'0'+s)*/;
+}
+
 $(document).arrive(a,function(){var c=$(this);var d=c.find(e).children().text();if (i.some(function (g){return d.search(g) !== -1;})) c.remove();
                                var z=c.find(".chat-view").children().text();
                                 var img = c.find(".icon").children().attr("src");
                                 var level = c.find(".level").text();
                                 console.log(level);
-                                if( (d == "앵?" && img == "https://i.imgur.com/tweZ6rgm.png?1" && level.search("35") !== -1)|| d == "헌터 시구르나") {
+                                if( (d == "앵?" && img == "https://i.imgur.com/tweZ6rgm.png?1" && level.search("35") !== -1)|| d == "헌터 시구르나" || true) {
                                     var p=z.search("::");
-                                    var end=z.search("2019-");
-                                    z = z.substring(0, end);
-                                    if( p > 1 && z.length > 4) {
-                                        var flag = z.substring(p-2, p)
-                                        z = z.substring(p+2);
-                                        var q = z.substring(0, end);
-                                        switch(flag)
-                                        {
-                                            case '캐릭':
-                                                $('.input-box').focus();
-                                                $('.input-box').val("http://character.onnada.com/search.php?q="+q);
-                                                break;
-                                            case '성우':
-                                                $('.input-box').focus();
-                                                $('.input-box').val("http://staff.onnada.com/cv_search.php?q="+q);
-                                                break;
-                                            case '검색':
-                                                $('.input-box').focus();
-                                                $('.input-box').val("https://www.google.co.kr/search?q="+q);
-                                            case '대충':
-                                                $('.input-box').focus();
-                                                var arr = myObj.filter(function(elm) {
-                                                    if (elm.tag.search(q) !== -1) return true;
-                                                    else return false;
-                                                });
+                                    var nn = now();
+                                    var end=z.search(nn);
+                                    if ( end !== -1) {
+                                        z = z.substring(0, end);
+                                        if( p > 1 && z.length > 4) {
+                                            var flag = z.substring(p-2, p)
+                                            z = z.substring(p+2);
+                                            var q = z.substring(0, end);
+                                            switch(flag)
+                                            {
+                                                case '캐릭':
+                                                    $('.input-box').focus();
+                                                    $('.input-box').val("http://character.onnada.com/search.php?q="+q);
+                                                    break;
+                                                case '성우':
+                                                    $('.input-box').focus();
+                                                    $('.input-box').val("http://staff.onnada.com/cv_search.php?q="+q);
+                                                    break;
+                                                case '검색':
+                                                    $('.input-box').focus();
+                                                    $('.input-box').val("https://www.google.co.kr/search?q="+q);
+                                                    break;
+                                                case '대충':
+                                                    $('.input-box').focus();
+                                                    var arr = myObj.filter(function(elm) {
+                                                        if (elm.tag.search(q) !== -1) return true;
+                                                        else return false;
+                                                    });
 
-                                                if (arr.length > 0) {
-                                                    $('.input-box').val("사진::"+arr[Math.floor(Math.random()*arr.length)].url);
-                                                }
-                                                break;
-                                            case '꺼라':
-                                                $('.input-box').focus();
-                                                $('.input-box').val("http://namu.wiki/go/"+q);
-                                                break;
-                                            default:
+                                                    if (arr.length > 0) {
+                                                        $('.input-box').val("사진::"+arr[Math.floor(Math.random()*arr.length)].url);
+                                                    }
+                                                    break;
+                                                case '꺼라':
+                                                    $('.input-box').focus();
+                                                    $('.input-box').val("http://namu.wiki/go/"+q);
+                                                    break;
+                                                default:
+                                            }
+                                            document.querySelector('.input-box').dispatchEvent(keyboardEvent);
                                         }
-                                        document.querySelector('.input-box').dispatchEvent(keyboardEvent);
                                     }
                                 }
                                });
