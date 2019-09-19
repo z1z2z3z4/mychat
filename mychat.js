@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         mychat
-// @version      1.07
+// @version      1.08
 // @description  ignore chat
 // @author       z1z2z3z4
 // @match        http://mycast.xyz/home/chat/*
@@ -28,27 +28,54 @@ var keyboardEvent = new KeyboardEvent('keydown', {
 });
 $(document).arrive(a,function(){var c=$(this);var d=c.find(e).children().text();if (i.some(function (g){return d.search(g) !== -1;})) c.remove();
                                var z=c.find(".chat-view").children().text();
-                                var p=z.search("::");
-                                if(d == "앵?" && p > 1) {
-                                    var flag = z.substring(p-2, p)
-                                    z = z.substring(p+4);
+                                if(d == "앵?" || d == "헌터 시구르나") {
+                                    var p=z.search("::");
                                     var end=z.search("2019-");
-                                    switch(flag)
-                                    {
-                                        case '캐릭':
-                                            $('.input-box').focus();
-                                            $('.input-box').val("http://character.onnada.com/search.php?q=" +z.substring(0, end));
-                                            break;
-                                        case '성우':
-                                            $('.input-box').focus();
-                                            $('.input-box').val("http://staff.onnada.com/cv_search.php?q="+z.substring(0, end));
-                                            break;
-                                        default:
-                                    }
-//                                   $('.input-box').val(d.substring(0, end));
-                                    document.querySelector('.input-box').dispatchEvent(keyboardEvent);
+                                    z = z.substring(0, end);
+                                    if( p > 1 && z.length > 4) {
+                                        var flag = z.substring(p-2, p)
+                                        z = z.substring(p+2);
+                                        var q = z.substring(0, end);
+                                        switch(flag)
+                                        {
+                                            case '캐릭':
+                                                $('.input-box').focus();
+                                                $('.input-box').val("http://character.onnada.com/search.php?q="+q);
+                                                break;
+                                            case '성우':
+                                                $('.input-box').focus();
+                                                $('.input-box').val("http://staff.onnada.com/cv_search.php?q="+q);
+                                                break;
+                                            case '검색':
+                                                $('.input-box').focus();
+                                                $('.input-box').val("https://www.google.co.kr/search?q="+q);
+                                            case '대충':
+                                                $('.input-box').focus();
 
-//                                   $('.input-box').val('');
-                               }
+                                                var xmlhttp = new XMLHttpRequest();
+                                                xmlhttp.onreadystatechange = function() {
+                                                    if (this.readyState == 4 && this.status == 200) {
+                                                        var myObj = JSON.parse(this.responseText);
+                                                        var arr = myObj.filter(function(elm) {
+                                                            if (elm.tag.search(q) !== -1) return true;
+                                                            else return false;
+                                                        });
+
+                                                        if (arr.length > 0) {
+                                                            $('.input-box').val("사진::"+arr[Math.floor(Math.random()*arr.length)].url);
+                                                        }
+                                                    }
+                                                };
+                                                xmlhttp.open("GET", "http://mycast.xyz/home/photo/photolist/", false);
+                                                xmlhttp.send();
+                                                break;
+                                            default:
+                                        }
+//                                   $('.input-box').val(d.substring(0, end));
+                                        document.querySelector('.input-box').dispatchEvent(keyboardEvent);
+//                                        $('.input-box').blur();
+                                        //                                   $('.input-box').val('');
+                                    }
+                                }
                                });
 $(document).on('click',b+e, function () {i.push($(this).children().text());console.log(i[i.length-1])});
