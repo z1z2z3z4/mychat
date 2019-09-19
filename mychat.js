@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         mychat
-// @version      1.05
+// @version      1.06
 // @description  ignore chat
 // @author       z1z2z3z4
 // @match        http://mycast.xyz/home/chat/*
