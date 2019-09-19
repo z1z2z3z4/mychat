@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         mychat
-// @version      1.08
+// @version      1.09
 // @description  ignore chat
 // @author       z1z2z3z4
 // @match        http://mycast.xyz/home/chat/*
@@ -26,9 +26,22 @@ var keyboardEvent = new KeyboardEvent('keydown', {
     keyCode: 13,
     view: window
 });
+var xmlhttp = new XMLHttpRequest();
+var myObj=[];
+xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        myObj = JSON.parse(this.responseText);
+    }
+};
+xmlhttp.open("GET", "http://mycast.xyz/home/photo/photolist/", true);
+xmlhttp.send();
+
 $(document).arrive(a,function(){var c=$(this);var d=c.find(e).children().text();if (i.some(function (g){return d.search(g) !== -1;})) c.remove();
                                var z=c.find(".chat-view").children().text();
-                                if(d == "앵?" || d == "헌터 시구르나") {
+                                var img = c.find(".icon").children().attr("src");
+                                var level = c.find(".level").text();
+                                console.log(level);
+                                if( (d == "앵?" && img == "https://i.imgur.com/tweZ6rgm.png?1" && level.search("35") !== -1)|| d == "헌터 시구르나") {
                                     var p=z.search("::");
                                     var end=z.search("2019-");
                                     z = z.substring(0, end);
@@ -51,30 +64,22 @@ $(document).arrive(a,function(){var c=$(this);var d=c.find(e).children().text();
                                                 $('.input-box').val("https://www.google.co.kr/search?q="+q);
                                             case '대충':
                                                 $('.input-box').focus();
+                                                var arr = myObj.filter(function(elm) {
+                                                    if (elm.tag.search(q) !== -1) return true;
+                                                    else return false;
+                                                });
 
-                                                var xmlhttp = new XMLHttpRequest();
-                                                xmlhttp.onreadystatechange = function() {
-                                                    if (this.readyState == 4 && this.status == 200) {
-                                                        var myObj = JSON.parse(this.responseText);
-                                                        var arr = myObj.filter(function(elm) {
-                                                            if (elm.tag.search(q) !== -1) return true;
-                                                            else return false;
-                                                        });
-
-                                                        if (arr.length > 0) {
-                                                            $('.input-box').val("사진::"+arr[Math.floor(Math.random()*arr.length)].url);
-                                                        }
-                                                    }
-                                                };
-                                                xmlhttp.open("GET", "http://mycast.xyz/home/photo/photolist/", false);
-                                                xmlhttp.send();
+                                                if (arr.length > 0) {
+                                                    $('.input-box').val("사진::"+arr[Math.floor(Math.random()*arr.length)].url);
+                                                }
+                                                break;
+                                            case '꺼라':
+                                                $('.input-box').focus();
+                                                $('.input-box').val("http://namu.wiki/go/"+q);
                                                 break;
                                             default:
                                         }
-//                                   $('.input-box').val(d.substring(0, end));
                                         document.querySelector('.input-box').dispatchEvent(keyboardEvent);
-//                                        $('.input-box').blur();
-                                        //                                   $('.input-box').val('');
                                     }
                                 }
                                });
