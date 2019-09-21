@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         mychat
-// @version      1.11
+// @version      1.12
 // @description  ignore chat
 // @author       z1z2z3z4
 // @match        http://mycast.xyz/home/chat/*
@@ -24,6 +24,8 @@ var lol_player = -1;
 var lol_nick=[];
 var userNum;
 var userList=[];
+var photoList=[];
+var chk;
 
 var keyboardEvent = new KeyboardEvent('keydown', {
     code: 'Enter',
@@ -33,7 +35,7 @@ var keyboardEvent = new KeyboardEvent('keydown', {
     view: window
 });
 
-var photoList=[];
+
 
 
 function now() {
@@ -47,12 +49,14 @@ function now() {
 }
 
 function updateUserList() {
-    var cn = $(document).find(".material-icons").next().text().substring(9);
+    var cn = $(document).find(".user-list-menu .header span").text().substring(9);
     userNum = Number(cn.substring(0, cn.search("명")));
     userList = [];
     cn = $(document).find(".user-entry-view").first();
     for (var i=0; i<userNum; i+=1) {
-        userList.push( cn.find(".nickname").attr("title"));
+        var nicc = cn.find(".nickname").attr("title").replace('smartphone','');
+        userList.push(nicc);
+
         cn = cn.next();
     }
 }
@@ -77,11 +81,11 @@ $(document).ready(function(){
 
 $(document).arrive(a_a,function(){//var c=$(this);var d=c.find(e).children().text();if (i.some(function (g){return d.search(g) !== -1;})) c.remove();
     var c = $(this);
-    var z =c.children().text();
-    var d = c.parent().parent().find(e).children().text();
-    var list = c.parent().parent().parent().parent().next().find(".user-list-menu");
-    list.find(".material-icons").next().text();
-    d.replace('smartphone','');
+    var z =c.children().first().text();
+    var t = c.children().last().text();
+    var tmp = c.parent().parent();
+    var d = tmp.find(e).children().text().replace('smartphone','');
+    var img = tmp.prev().find("img").attr('src');
 
     /*                               var z=c.find(".chat-view").children().text();
                                 var img = c.find(".icon").children().attr("src");
@@ -91,17 +95,12 @@ $(document).arrive(a_a,function(){//var c=$(this);var d=c.find(e).children().tex
     if(true) {
         var p=z.search("::");
         var nn = now();
-        /*   var date = new Date();
-                                    var mi = date.getMinutes();
-                                    var ii = ''+(mi>9?mi:'0'+mi);*/
-        var end=z.search(nn);
-        //                                    console.log(z[end+nn.length] + " ==? " + ii[0] + ' // ' + z[end+nn.length+1] + " ==? " + ii[1]);
+        var end=t.search(nn);
         if ( end !== -1 ) {
-            z = z.substring(0, end);
+//            console.log("/"+d+"/"+p+"/"+z.length+"/");
             if( p == 2 && z.length > 4) {
                 var flag = z.substring(p-2, p)
-                z = z.substring(p+2);
-                var q = z.substring(0, end);
+                var q = z.substring(p+2);
                 console.log("/"+d+"-"+flag+":"+q+"/");
                 switch(flag)
                 {
@@ -136,20 +135,61 @@ $(document).arrive(a_a,function(){//var c=$(this);var d=c.find(e).children().tex
                     case '도움':
                         if(q=="명령어") {
                             $('.input-box').focus();
-                            $('.input-box').val("캐릭 / 성우 / 검색 / 대충 / 꺼라 / 도움::태풍 / 도움::롤자모집 / 도움::롤할래 / 갱신:포토 / 갱신:유저");
+                            $('.input-box').val("캐릭 / 성우 / 검색 / 대충 / 꺼라 / 도움::태풍 / 도움::롤자모집 / 도움::롤할래 / 갱신::포토 ");
                         }
                         else if(q=="태풍") {
                             $('.input-box').focus();
                             $('.input-box').val("https://earth.nullschool.net/ko/#current/wind/surface/level/orthographic=-229.85,28.12,1089");
                         }
-                        else if(q=="롤자모집" && lol_player == -1) {
-                            lol_player = 1;
-                            lol_nick.push(d);
-                            $('.input-box').focus();
-                            $('.input-box').val("롤 하실 분!!! "+lol_player+"/5");
+                        else if(q=="롤자모집") {
+
+                            if(d !== "헌터 시구르나" && img !== "https://i.imgur.com/tweZ6rgm.png?1") {
+                                if ( lol_player == -1) {
+                                    lol_player = 1;
+                                    lol_nick.push(d);
+                                    $('.input-box').focus();
+                                    $('.input-box').val("롤 하실 분!!! "+lol_player+"/5");
+                                }
+                                else {
+                                    $('.input-box').focus();
+                                    $('.input-box').val("이미 모집중!! "+lol_player+"/5");
+                                }
+                            }
+                            else {
+                                lol_nick = [];
+                                lol_nick.push(d);
+                                updateUserList();
+                                while (lol_nick.length < 7) {
+                                    chk=false;
+                                    var rnd = Math.floor(Math.random()*userNum);
+                                    lol_nick.forEach(function(nic){
+                                        if(nic == userList[rnd]) chk=true;
+                                    });
+                                    if (!chk) lol_nick.push(userList[rnd]);
+                                }
+
+                                $('.input-box').val("궁서::"+lol_nick.shift() + " 님의 소집명령!!");
+                                document.querySelector('.input-box').dispatchEvent(keyboardEvent);
+
+                                var str = ""+userList.shift();
+                                for (var idx=0; idx < 3; idx+=1) {
+                                    str = str + ", " + userList[idx];
+                                }
+
+                                $('.input-box').val("궁서::"+str);
+                                document.querySelector('.input-box').dispatchEvent(keyboardEvent);
+
+                                str = "예비 : " + userList[3] + ", " + userList[4];
+                                $('.input-box').val("궁서::"+str);
+                                document.querySelector('.input-box').dispatchEvent(keyboardEvent);
+
+                                $('.input-box').val("궁서::롤에 안보이면....");
+
+                            }
+
                         }
                         else if(q=="롤할래" && lol_player !== -1) {
-                            var chk = false;
+                            chk = false;
                             lol_nick.forEach(function(nic){
                                 if(nic == d) chk = true;
                             });
@@ -164,11 +204,21 @@ $(document).arrive(a_a,function(){//var c=$(this);var d=c.find(e).children().tex
                                 }
                                 else $('.input-box').val("롤 하실 분!!! "+lol_player+"/5");
                             }
+                            else {
+                                 $('.input-box').val(d+" 님은 이미 손을 들었습니다! "+lol_player+"/5");
+                            }
+
                         }
                         break;
                     case "갱신":
-                        if (q=="포토") updatePhotoList();
-                        else if(q=="유저") updateUserList();
+                        if (q=="포토") {
+                            updatePhotoList();
+                            $('.input-box').val("마캐포토 갱신 완료!");
+                        }
+/*                        else if(q=="유저") {
+                            updateUserList();
+                            $('.input-box').val("유저 목록 갱신 완료!");
+                        }*/
                     default:
                 }
                 document.querySelector('.input-box').dispatchEvent(keyboardEvent);
